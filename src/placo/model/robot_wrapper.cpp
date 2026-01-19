@@ -396,6 +396,12 @@ RobotWrapper::self_collisions(bool stop_at_first) {
   std::vector<Collision> collisions;
   pinocchio::GeometryData geom_data(collision_model);
 
+  // Enabling contact computation
+  for (auto& entry : geom_data.collisionRequests)
+  {
+    entry.enable_contact = true;
+  }
+
   // And test all the collision pairs
   pinocchio::computeCollisions(model, *data, collision_model, geom_data,
                                state.q);
@@ -433,6 +439,12 @@ RobotWrapper::self_collisions(bool stop_at_first) {
 std::vector<RobotWrapper::Distance> RobotWrapper::distances() {
   std::vector<Distance> distances;
   pinocchio::GeometryData geom_data(collision_model);
+
+  // Enabling contact computation
+  for (auto& entry : geom_data.collisionRequests)
+  {
+    entry.enable_contact = true;
+  }
 
   // And test all the collision pairs
   pinocchio::computeDistances(model, *data, collision_model, geom_data,

@@ -308,7 +308,9 @@ void exposeKinematics() {
       .add_property("L_world", &CentroidalMomentumTask::L_world,
                     &CentroidalMomentumTask::L_world);
 
-  class__<RegularizationTask, bases<Task>>("RegularizationTask");
+  class__<RegularizationTask, bases<Task>>("RegularizationTask")
+      .def("set_weight", &RegularizationTask::set_weight)
+      .def("set_joint_weight", &RegularizationTask::set_joint_weight);
 
   class__<ManipulabilityTask, bases<Task>>(
       "ManipulabilityTask",

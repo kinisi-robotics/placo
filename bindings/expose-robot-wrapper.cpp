@@ -92,7 +92,7 @@ void exposeRobotType(class_<RobotType, W1> &type) {
             boost::python::dict dict;
 
             for (auto &dof : robot.joint_names()) {
-              dict[dof] = torques[robot.get_joint_v_offset(dof)];
+              dict[dof] = torques[robot.get_joint_v_offset(dof)];::Vector3d om
             }
 
             return dict;
@@ -212,8 +212,9 @@ void exposeRobotWrapper() {
 
   exposeRobotType<HumanoidRobot>(humanoidWrapper);
   humanoidWrapper
-      .def<void (HumanoidRobot::*)(const std::string &)>(
-          "update_support_side", &HumanoidRobot::update_support_side)
+      .def<void (HumanoidRobot::*)(const std::string&)>("update_support_side", &HumanoidRobot::update_support_side)
+      .def<void (HumanoidRobot::*)(const std::string&, const std::string&)>("update_support_side_with_frame",
+                                                                            &HumanoidRobot::update_support_side)
       .def("ensure_on_floor", &HumanoidRobot::ensure_on_floor)
       .def("ensure_on_floor_oriented", &HumanoidRobot::ensure_on_floor_oriented)
       .def("update_from_imu", &HumanoidRobot::update_from_imu)

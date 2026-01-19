@@ -29,6 +29,12 @@ public:
   void update_support_side(const std::string &side);
 
   /**
+   * @brief Updates which frame should be the current support
+   */
+  void update_support_side(Side side, RobotWrapper::FrameIndex frame);
+  void update_support_side(const std::string& side, const std::string& frame);
+
+  /**
    * @brief Place the robot on its support on the floor
    */
   void ensure_on_floor();
@@ -88,10 +94,6 @@ public:
    */
   Eigen::Vector2d zmp(double omega, Eigen::Vector2d com_acceleration);
 
-  // We suppose we have one support frame and associated transformation
-  RobotWrapper::FrameIndex support_frame();
-  RobotWrapper::FrameIndex flying_frame();
-
   /**
    * @brief Get the pan and tilt target for the camera to look at a target
    * position
@@ -126,7 +128,12 @@ public:
   bool support_is_both;
 
   /**
-   * @brief The current side (left or right) associated with T_world_support
+   * @brief The current support frame
+   */
+  RobotWrapper::FrameIndex support_frame;
+
+  /**
+   * @brief The current support side
    */
   Side support_side;
 

@@ -155,10 +155,11 @@ WheelTask &KinematicsSolver::add_wheel_task(std::string joint, double radius,
   return add_task(new WheelTask(joint, radius, omniwheel));
 }
 
-RegularizationTask &
-KinematicsSolver::add_regularization_task(double magnitude) {
-  RegularizationTask &task = add_task(new RegularizationTask());
-  task.configure("regularization", Task::Priority::Soft, magnitude);
+RegularizationTask& KinematicsSolver::add_regularization_task(double magnitude)
+{
+  RegularizationTask& task = add_task(new RegularizationTask());
+  task.set_weight(magnitude);
+  task.configure("regularization", Task::Priority::Soft, 1.0);
 
   return task;
 }

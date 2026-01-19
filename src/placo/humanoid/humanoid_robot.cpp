@@ -34,6 +34,7 @@ void HumanoidRobot::initialize() { init_config(); }
 
 void HumanoidRobot::init_config() {
   support_side = Left;
+  support_frame = get_frame_index("left_foot");
   support_is_both = false;
 
   T_world_support.setIdentity();
@@ -65,21 +66,38 @@ Eigen::Affine3d HumanoidRobot::get_T_world_trunk() {
   return get_T_world_frame(trunk);
 }
 
-void HumanoidRobot::update_support_side(HumanoidRobot::Side new_side) {
-  if (new_side != support_side) {
-    // Updating the support frame to this frame
-    support_side = new_side;
-    update_kinematics();
+void HumanoidRobot::update_support_side(HumanoidRobot::Side new_side)
+{
+  RobotWrapper::FrameIndex new_frame = (new_side == Left) ? left_foot : right_foot;
+  update_support_side(new_side, new_frame);
+}
 
-    T_world_support =
-        tools::flatten_on_floor(get_T_world_frame(support_frame()));
+void HumanoidRobot::update_support_side(const std::string& side)
+{
+  update_support_side(string_to_side(side));
+}
+
+void HumanoidRobot::update_support_side(Side side, RobotWrapper::FrameIndex frame)
+{
+  if (frame != support_frame)
+  {
+    support_frame = frame;
+    support_side = side;
+    T_world_support = tools::flatten_on_floor(get_T_world_frame(support_frame));
   }
 }
 
-void HumanoidRobot::ensure_on_floor() {
+void HumanoidRobot::update_support_side(const std::string& side, const std::string& frame)
+{
+  RobotWrapper::FrameIndex frame_index = get_frame_index(frame);
+  update_support_side(string_to_side(side), frame_index);
+}
+
+void HumanoidRobot::ensure_on_floor()
+{
   // Updating the floating base so that the foot is where we want
   update_kinematics();
-  set_T_world_frame(support_frame(), T_world_support);
+  set_T_world_frame(support_frame, T_world_support);
   update_kinematics();
 }
 
@@ -87,47 +105,33 @@ void HumanoidRobot::ensure_on_floor_oriented(Eigen::Matrix3d R_world_trunk) {
   update_kinematics();
 
   // Getting the support orientation
-  Eigen::Affine3d T_trunk_support = get_T_a_b(trunk, support_frame());
+  Eigen::Affine3d T_trunk_support = get_T_a_b(trunk, support_frame);
   Eigen::Matrix3d R_world_support = R_world_trunk * T_trunk_support.linear();
   T_world_support.linear() = R_world_support;
 
-  set_T_world_frame(support_frame(), T_world_support);
+  set_T_world_frame(support_frame, T_world_support);
   update_kinematics();
 }
 
 void HumanoidRobot::update_from_imu(Eigen::Matrix3d R_world_trunk) {
   update_kinematics();
 
-  Eigen::Affine3d T_trunk_support = get_T_a_b(trunk, support_frame());
+  Eigen::Affine3d T_trunk_support = get_T_a_b(trunk, support_frame);
   T_world_support.linear() = R_world_trunk * T_trunk_support.linear();
 
-  set_T_world_frame(support_frame(), T_world_support);
+  set_T_world_frame(support_frame, T_world_support);
   update_kinematics();
 }
 
-placo::model::RobotWrapper::FrameIndex HumanoidRobot::support_frame() {
-  return support_side == Left ? left_foot : right_foot;
-}
-
-placo::model::RobotWrapper::FrameIndex HumanoidRobot::flying_frame() {
-  return support_side == Left ? right_foot : left_foot;
-}
-
-void HumanoidRobot::update_support_side(const std::string &side) {
-  update_support_side(string_to_side(side));
-}
-
-Eigen::Vector3d HumanoidRobot::get_com_velocity(Side support,
-                                                Eigen::Vector3d omega_b) {
+Eigen::Vector3d HumanoidRobot::get_com_velocity(Side support, Eigen::Vector3d omega_b)
+{
   // CoM Jacobians
   Eigen::Matrix3Xd J_C = com_jacobian();
   Eigen::Matrix3Xd J_u_C = J_C.leftCols(6);
   Eigen::Matrix3Xd J_a_C = J_C.rightCols(20);
 
   // Support foot
-  Eigen::MatrixXd J_contact = support == Left
-                                  ? frame_jacobian("left_foot", "local")
-                                  : frame_jacobian("right_foot", "local");
+  Eigen::MatrixXd J_contact = frame_jacobian(support_frame, pinocchio::ReferenceFrame::LOCAL);
 
   // IMU body Jacobian
   Eigen::MatrixXd J_IMU = frame_jacobian("trunk", "local");
@@ -275,8 +279,12 @@ void HumanoidRobot::read_from_histories(
     b << Eigen::Vector3d::Zero(), omega_trunk;
 
     Eigen::MatrixXd J(6, model.nv);
+<<<<<<< HEAD
     J << frame_jacobian(support_frame(), pinocchio::ReferenceFrame::LOCAL)
              .topRows(3),
+=======
+    J << frame_jacobian(support_frame, pinocchio::ReferenceFrame::LOCAL).topRows(3),
+>>>>>>> 81c9e0d7f65a6ad8ffc46d7f2f906caa4f947c70
         frame_jacobian("trunk", "local").bottomRows(3);
     Eigen::MatrixXd J_bf = J.leftCols(6);
     Eigen::MatrixXd J_a = J.rightCols(model.nv - 6);

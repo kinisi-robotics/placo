@@ -554,6 +554,8 @@ public:
     return *constraint;
   }
 
+  problem::Variable *get_qd() { return qd; }
+
 protected:
   problem::Variable *qd = nullptr;
   problem::Variable *scale_variable = nullptr;

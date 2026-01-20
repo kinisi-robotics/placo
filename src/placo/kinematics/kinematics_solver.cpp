@@ -155,9 +155,9 @@ WheelTask &KinematicsSolver::add_wheel_task(std::string joint, double radius,
   return add_task(new WheelTask(joint, radius, omniwheel));
 }
 
-RegularizationTask& KinematicsSolver::add_regularization_task(double magnitude)
-{
-  RegularizationTask& task = add_task(new RegularizationTask());
+RegularizationTask &
+KinematicsSolver::add_regularization_task(double magnitude) {
+  RegularizationTask &task = add_task(new RegularizationTask());
   task.set_weight(magnitude);
   task.configure("regularization", Task::Priority::Soft, 1.0);
 
@@ -254,18 +254,14 @@ DistanceConstraint &KinematicsSolver::add_distance_constraint(
                                  robot.get_frame_index(frame_b), distance_max);
 }
 
-void KinematicsSolver::mask_dof(std::string dof)
-{
-  for (int i = 0; i < robot.get_joint_v_size(dof); i++)
-  {
+void KinematicsSolver::mask_dof(std::string dof) {
+  for (int i = 0; i < robot.get_joint_v_size(dof); i++) {
     masked_dof.insert(robot.get_joint_v_offset(dof) + i);
   }
 }
 
-void KinematicsSolver::unmask_dof(std::string dof)
-{
-  for (int i = 0; i < robot.get_joint_v_size(dof); i++)
-  {
+void KinematicsSolver::unmask_dof(std::string dof) {
+  for (int i = 0; i < robot.get_joint_v_size(dof); i++) {
     masked_dof.erase(robot.get_joint_v_offset(dof) + i);
   }
 }

@@ -92,7 +92,7 @@ void exposeRobotType(class_<RobotType, W1> &type) {
             boost::python::dict dict;
 
             for (auto &dof : robot.joint_names()) {
-              dict[dof] = torques[robot.get_joint_v_offset(dof)];::Vector3d om
+              dict[dof] = torques[robot.get_joint_v_offset(dof)];
             }
 
             return dict;
